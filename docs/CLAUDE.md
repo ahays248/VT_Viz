@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-VizOne is a Three.js-based visualization of the Volt Typhoon APT group's attack on critical infrastructure. The project evolved from a generic particle gravity simulation to a specific, intelligence-driven visualization based on CISA advisories and Microsoft threat intelligence.
+VT_Viz is a Three.js-based interactive visualization depicting the Volt Typhoon APT group's real-world attack on U.S. critical infrastructure. This educational tool visualizes the complete 72-hour attack chain from initial compromise through data exfiltration, based entirely on official CISA advisories and Microsoft threat intelligence reports.
 
 ## Key Design Decisions
 
@@ -17,9 +17,9 @@ VizOne is a Three.js-based visualization of the Volt Typhoon APT group's attack 
 - **Implementation**: `volt-typhoon-timeline.js` positions nodes in three distinct zones
 
 ### 3. Timeline-Based Animation
-- **Decision**: 72-hour timeline with 6 stages
+- **Decision**: 72-hour timeline with 5 stages plus info boxes
 - **Rationale**: Matches actual dwell time observed in Volt Typhoon attacks
-- **Implementation**: GSAP timeline controls packet animations and stage transitions
+- **Implementation**: GSAP timeline controls packet animations, stage transitions, and info box displays
 
 ### 4. Side/Top-Down Camera View
 - **Decision**: Angled perspective with dynamic following
@@ -32,7 +32,7 @@ VizOne is a Three.js-based visualization of the Volt Typhoon APT group's attack 
 
 ```
 src/
-├── volt-typhoon-timeline.js  # Main timeline and attack logic (1070 lines)
+├── volt-typhoon-timeline.js  # Main timeline and attack logic (1600+ lines)
 ├── scene.js                   # Three.js scene setup
 ├── main.js                    # Application entry point
 ├── controls.js                # User interaction handlers
@@ -40,10 +40,10 @@ src/
 
 public/
 └── data/
-    └── volt-typhoon-attack.json  # Attack event timeline
+    └── sample.json               # Attack event timeline (117 events)
 
 scripts/
-└── generate-volt-typhoon-data.js  # Data generation script
+└── generate-volt-typhoon-data.js  # Data generation script (creates 117 attack events)
 ```
 
 ### Data Flow
@@ -67,9 +67,13 @@ generate-volt-typhoon-data.js
 ```javascript
 class VoltTyphoonTimeline {
   constructor(scene, data, camera, controls) {
-    this.playbackSpeed = 45;  // Default 45x speed
+    this.playbackSpeed = 45;  // Default 45x speed (1x = 12 minutes)
     this.stages = [...];      // 5 attack stages
     this.nodeMap = new Map(); // IP to node mapping
+    this.cveExplained = false; // Track info box displays
+    this.criticalAccessShown = false;
+    this.ntdsShown = false;
+    this.otShown = false;
   }
 
   createNetworkInfrastructure() {
@@ -91,8 +95,8 @@ class VoltTyphoonTimeline {
   }
 
   update(deltaTime) {
-    // Speed calculation: deltaTime * playbackSpeed * 3600 * 1000
-    // 1x = 72 seconds, 60x = 1.2 seconds
+    // Speed calculation: deltaTime * playbackSpeed * 360 * 1000
+    // 1x = 12 minutes (720 seconds), 45x = 16 seconds
   }
 }
 ```
@@ -295,15 +299,16 @@ class VoltTyphoonTimeline {
 
 ```bash
 # Development
-npm run dev           # Start dev server
+npm run dev           # Start dev server (http://localhost:3000/)
 npm run build        # Production build
 npm run preview      # Preview production build
+npm run generate-data # Generate attack event data
 
-# Data Generation
-node scripts/generate-volt-typhoon-data.js
-
-# Testing (when implemented)
-npm run test
+# Quick Start
+git clone https://github.com/ahays248/VT_Viz.git
+cd VT_Viz
+npm install
+npm run dev
 ```
 
 ## Code Style Guidelines
@@ -335,6 +340,7 @@ See [LESSONS-LEARNED-THREEJS.md](./LESSONS-LEARNED-THREEJS.md) for comprehensive
 
 ---
 
-*Last Updated: December 2024*
+*Last Updated: January 2025*
+*Repository: https://github.com/ahays248/VT_Viz*
 *Purpose: Educational cybersecurity visualization*
 *Classification: Public/Unclassified*
