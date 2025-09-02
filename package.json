@@ -1,0 +1,23 @@
+{
+  "name": "vizone",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": ["threejs", "visualization", "cybersecurity", "data-visualization", "webgl"],
+  "author": "",
+  "license": "MIT",
+  "description": "Artistic cybersecurity data visualization using Three.js with gravity-based particle physics",
+  "devDependencies": {
+    "vite": "^7.1.4"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "dat.gui": "^0.7.9",
+    "gsap": "^3.13.0",
+    "three": "^0.179.1"
+  }
+}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VizOne - Cybersecurity Data Gravity Visualization</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #00ffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 300px;
+      z-index: 100;
+    }
+
+    .info-panel h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #00ffff;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .info-panel p {
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 15px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .controls-hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      z-index: 100;
+    }
+
+    .dg.ac {
+      z-index: 200 !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="loading-screen" id="loading">
+      <div class="loader"></div>
+      <div class="loading-text">Initializing Visualization</div>
+    </div>
+    
+    <div id="canvas-container"></div>
+    
+    <div class="info-panel" style="max-width: 350px; position: fixed; top: 300px; right: 20px; left: auto; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);">
+      <h1 style="font-size: 18px; margin-bottom: 8px; color: #00ffff;">Volt Typhoon Attack Timeline</h1>
+      <p style="font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 12px;">72-hour Chinese APT operation against critical infrastructure</p>
+      
+      <div id="attack-stages" style="font-size: 11px; line-height: 1.5; margin-bottom: 12px;">
+        <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="color: #9900ff; font-weight: bold;">Stage 1: Initial Access (0-6h)</div>
+          <div style="color: #00ffff;">CVE-2024-39717</div>
+          <div style="color: rgba(255,255,255,0.7); font-size: 10px;">Versa Director zero-day authentication bypass. Deployed VersaMem web shell on SD-WAN controller.</div>
+        </div>
+        
+        <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="color: #ffff00; font-weight: bold;">Stage 2: Discovery (6-24h)</div>
+          <div style="color: #00ffff;">T1059.001 - PowerShell</div>
+          <div style="color: rgba(255,255,255,0.7); font-size: 10px;">LOTL tools: powershell.exe, wmic.exe, ntdsutil.exe for network enumeration. No malware deployed.</div>
+        </div>
+        
+        <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="color: #ff8800; font-weight: bold;">Stage 3: Lateral Movement (24-48h)</div>
+          <div style="color: #00ffff;">T1021.001 - RDP</div>
+          <div style="color: rgba(255,255,255,0.7); font-size: 10px;">RDP chain through jump boxes to Domain Controller using stolen credentials.</div>
+        </div>
+        
+        <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="color: #ff0000; font-weight: bold;">Stage 4: Domain Compromise (48-60h)</div>
+          <div style="color: #00ffff;">T1003.003 - NTDS.dit</div>
+          <div style="color: rgba(255,255,255,0.7); font-size: 10px;">Volume Shadow Copy to extract AD database. Gained access to SCADA/OT systems.</div>
+        </div>
+        
+        <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="color: #ff00ff; font-weight: bold;">Stage 5: Exfiltration (60-72h)</div>
+          <div style="color: #00ffff;">T1090.003 - Multi-hop Proxy</div>
+          <div style="color: rgba(255,255,255,0.7); font-size: 10px;">Data routed: New Caledonia → Pacific → Guam → China C2. Cleared Windows Event Logs.</div>
+        </div>
+      </div>
+      
+      <div id="impact-conclusion" style="background: rgba(255,0,0,0.1); padding: 8px; border-radius: 5px; border: 1px solid rgba(255,0,0,0.3);">
+        <div style="color: #ff6666; font-weight: bold; font-size: 11px; margin-bottom: 4px;">CRITICAL IMPACT</div>
+        <div style="color: rgba(255,255,255,0.8); font-size: 10px; line-height: 1.4;">
+          <strong>Data Stolen:</strong> AD credentials, SCADA configs, water treatment parameters, power grid topology<br>
+          <strong>Potential Use:</strong> Pre-positioned for infrastructure disruption during geopolitical conflict. Can manipulate water treatment chemicals, disrupt power grid, or destroy industrial equipment.
+        </div>
+      </div>
+      
+      <div class="stats" style="margin-top: 10px; display: none;">
+        <div class="stat-item">
+          <span class="stat-label">FPS</span>
+          <span class="stat-value" id="fps-count">60</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="controls-hint">
+      Left Click + Drag to rotate • Right Click + Drag to pan • Scroll to zoom
+    </div>
+  </div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "metadata": {
+    "source": "VizOne Sample Dataset",
+    "version": "1.0.0",
+    "description": "Sample cybersecurity events for visualization demo"
+  },
+  "events": []
+}
