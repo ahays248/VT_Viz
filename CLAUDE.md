@@ -1,236 +1,150 @@
-# CLAUDE.md - VizOne Project Context
+# CLAUDE.md - VT_Viz Project Context
 
 ## Project Overview
-VizOne is an artistic cybersecurity data visualization using Three.js with gravity-based particle physics. The goal is to create a visually stunning, performant 3D visualization that represents security events as particles in space with physical interactions.
+VT_Viz is an interactive 3D visualization of the Volt Typhoon APT group's attack on U.S. critical infrastructure. This educational tool visualizes the complete 72-hour attack chain from initial compromise through data exfiltration, based entirely on official CISA advisories and Microsoft threat intelligence reports.
 
 ## Core Concept
-- **Threat Constellation**: Security events as particles with gravity-based attraction
-- **Visual Anomaly Detection**: Outliers break away from normal patterns
-- **Artistic Focus**: Prioritize beauty and visual impact over traditional charts
-- **Real-time Physics**: Continuous motion and interaction between data points
+- **Timeline-Based Attack Simulation**: 5 stages over 72 hours (compressed to minutes)
+- **Network Topology Visualization**: Proxy chains, IT systems, and OT/SCADA networks
+- **Educational Info Boxes**: Detailed explanations appear at critical moments
+- **Real Attack Data**: Based on CVE-2024-39717 and documented Volt Typhoon tactics
 
 ## Technical Architecture
 
 ### Rendering Pipeline
-1. **Scene Setup**: Three.js WebGLRenderer with post-processing
-2. **Particle System**: Instanced BufferGeometry for 10,000+ particles
-3. **Physics Engine**: Custom gravity simulation (not using physics libraries for performance)
-4. **Shaders**: Custom GLSL for particle rendering and effects
-5. **Post-processing**: Bloom, depth of field, motion blur
+1. **Scene Setup**: Three.js WebGLRenderer with camera controls
+2. **Network Nodes**: BoxGeometry (IT), CylinderGeometry (OT), styled by zone
+3. **Attack Packets**: Animated spheres with color-coded attack types
+4. **Timeline Control**: GSAP for animations and sequencing
+5. **Info Boxes**: DOM overlays with attack explanations
 
 ### Data Flow
-1. Load cybersecurity dataset (CSV/JSON)
-2. Process with D3.js (scaling, filtering)
-3. Map data attributes to visual properties
-4. Update particle positions via physics simulation
-5. Render with Three.js
+1. Load attack event data (117 events in JSON)
+2. Map events to timeline (72 hours → playback time)
+3. Create packet animations between network nodes
+4. Trigger info boxes at critical moments
+5. Update visualization based on playback speed
 
-### Performance Targets
-- 60 FPS with 10,000 particles
-- Sub-16ms frame time
-- Efficient memory usage (<500MB)
-- Mobile-responsive (30 FPS minimum)
+### Attack Stages
+1. **Initial Access** (0-6h): CVE-2024-39717 zero-day exploit
+2. **Discovery** (6-24h): Living Off the Land techniques
+3. **Lateral Movement** (24-48h): RDP chain to Domain Controller
+4. **Domain Compromise** (48-60h): NTDS.dit extraction
+5. **Exfiltration** (60-72h): Multi-hop proxy to China
 
 ## Key Files and Responsibilities
 
-### src/main.js
-- Application initialization
-- Asset loading coordination
-- Performance monitoring
-- Event handling setup
+### src/volt-typhoon-timeline.js (1600+ lines)
+- Main timeline control and attack logic
+- Network infrastructure creation
+- Packet flow animations
+- Info box display functions
+- Camera movement coordination
 
 ### src/scene.js
-- Three.js scene, camera, renderer setup
-- Lighting configuration
-- Post-processing pipeline
-- Render loop management
+- Three.js scene setup
+- Camera positioning
+- Renderer configuration
+- Lighting setup
 
-### src/particles.js
-- Particle system creation and management
-- BufferGeometry optimization
-- Particle attribute updates (color, size, position)
-- LOD system for large datasets
-
-### src/physics.js
-- Gravity simulation calculations
-- Spatial indexing (quadtree/octree)
-- Force calculations
-- Anomaly detection logic
-
-### src/data-loader.js
-- Dataset loading and parsing
-- Data preprocessing with D3
-- Attribute mapping configuration
-- Real-time data streaming support
+### src/main.js
+- Application initialization
+- Component coordination
+- Loading screen management
 
 ### src/controls.js
-- dat.GUI setup
-- Parameter management
-- User interaction handling
-- Settings persistence
+- Playback controls (play/pause/restart)
+- Speed controls (1x to 60x)
+- Camera controls (orbit)
 
-### src/shaders/
-- particle.vert: Vertex shader for particle positioning
-- particle.frag: Fragment shader for particle rendering
-- Custom effects shaders
+### src/data-loader.js
+- JSON data loading
+- Event data parsing
+
+### scripts/generate-volt-typhoon-data.js
+- Generates 117 attack events
+- Maps to MITRE ATT&CK techniques
+- Creates realistic timing
 
 ## Visual Design System
 
-### Color Palette
-- **Safe/Benign**: Blues (#0080ff to #00ffff)
-- **Warning**: Yellows (#ffff00 to #ff8800)
-- **Critical/Threat**: Reds (#ff0000 to #ff00ff)
-- **Background**: Dark gradient (#000000 to #1a1a2e)
-- **Accent**: Cyan glow (#00ffff)
+### Color Coding
+- **Purple (#9900ff)**: Zero-day exploitation
+- **Yellow (#ffff00)**: Discovery/reconnaissance  
+- **Orange (#ff8800)**: Lateral movement
+- **Red (#ff0000)**: Credential theft/critical access
+- **Cyan (#00ffff)**: Data exfiltration
+- **Green (#00ff00)**: OT/SCADA systems
 
-### Particle Properties
-- **Size**: Mapped to event severity (2-20 units)
-- **Color**: Threat level gradient
-- **Opacity**: Age/relevance (0.3-1.0)
-- **Trails**: Motion history visualization
-- **Glow**: Bloom intensity for emphasis
+### Network Zones
+- **Proxy Chain** (Left): Red boxes - compromised routers
+- **IT Network** (Center): Blue boxes - corporate systems
+- **OT Systems** (Right): Green cylinders - critical infrastructure
 
-### Animation Patterns
-- **Orbital**: Normal events orbit gravity wells
-- **Escape**: Anomalies accelerate away
-- **Pulse**: Critical events pulsate
-- **Swarm**: Related events cluster
-- **Explosion**: Major incidents disperse particles
+### Info Box Design
+- Dark backgrounds (rgba(0,0,0,0.95))
+- Colored borders matching alert type
+- High contrast white text
+- Appear bottom-left, fade after 7-8 seconds
 
-## Data Schema
+## Intelligence Sources
 
-### Expected Input Format
-```javascript
-{
-  timestamp: Date,
-  severity: 0-10,
-  category: string,
-  source_ip: string,
-  destination_ip: string,
-  attack_type: string,
-  confidence: 0-1,
-  related_events: array
-}
-```
+### Primary References
+- **CISA Advisory AA24-038A**: Main threat intelligence
+- **Microsoft Security Blog**: Technical analysis
+- **FBI PIN 240131-001**: Infrastructure impacts
+- **MITRE ATT&CK G1017**: Technique mapping
 
-### Visual Mapping
-- timestamp → animation timeline
-- severity → particle size
-- category → gravity well assignment
-- attack_type → color
-- confidence → opacity
-- related_events → particle connections
+### Key Intelligence Points
+- CVE-2024-39717: Versa Director zero-day
+- Living Off the Land exclusively (no malware)
+- 5+ year persistence in networks
+- Targets water treatment and power grids
 
 ## Performance Optimizations
 
-### Rendering
-- Use instanced rendering for particles
-- Frustum culling for off-screen particles
-- LOD system based on camera distance
-- Texture atlasing for particle sprites
+### Implemented
+- Object pooling for packet animations
+- Efficient timeline updates (only process due events)
+- Simple geometries for network nodes
+- Sprite-based text labels
+- GSAP for smooth animations
 
-### Physics
-- Spatial partitioning (octree)
-- Barnes-Hut approximation for distant forces
-- Fixed timestep with interpolation
-- SIMD optimizations where available
+### Speed Controls
+- 1x: 12 minutes for 72 hours (realistic pacing)
+- 45x: ~16 seconds (default - good balance)
+- 60x: ~12 seconds (maximum speed)
 
-### Memory
-- Object pooling for particles
-- Typed arrays for positions/attributes
-- Dispose unused geometries/materials
-- Lazy loading for large datasets
+## Recent Updates (January 2025)
 
-## Development Guidelines
+### Info Box System
+- Complete rewrite of all highlight functions
+- Dark backgrounds for readability
+- Proper fade animations and timing
+- Fixed zero-day box display issues
 
-### Code Style
-- ES6+ modules
-- Async/await for asynchronous operations
-- Descriptive variable names
-- Comments for complex algorithms
+### Timeline Flow
+- 117 events for continuous action
+- Removed unnecessary pauses
+- Sequential event processing
+- Camera follows attack progression
 
-### Testing Approach
-- Performance profiling with Chrome DevTools
-- Visual regression testing
-- Dataset edge cases (empty, massive, malformed)
-- Cross-browser compatibility checks
+## Repository
 
-### Common Issues & Solutions
+- **GitHub**: https://github.com/ahays248/VT_Viz
+- **Quick Start**: `git clone` → `npm install` → `npm run dev`
+- **Documentation**: See /docs folder for detailed guides
 
-1. **Performance Drops**
-   - Check particle count
-   - Verify shader complexity
-   - Profile with SpectorJS
-   - Reduce post-processing effects
+## Educational Purpose
 
-2. **Memory Leaks**
-   - Dispose Three.js objects properly
-   - Clear event listeners
-   - Monitor heap snapshots
-
-3. **Data Loading Failures**
-   - Validate dataset format
-   - Check CORS policies
-   - Implement fallback sample data
-
-4. **Visual Artifacts**
-   - Check depth buffer precision
-   - Verify blend modes
-   - Adjust near/far planes
-
-## Future Enhancements
-
-### Planned Features
-- Real-time data streaming via WebSocket
-- Machine learning anomaly detection
-- VR/AR support
-- Multi-dataset comparison view
-- Recording/playback system
-- Collaborative viewing sessions
-
-### Optimization Opportunities
-- WebGPU migration when stable
-- Worker threads for physics
-- Progressive loading for massive datasets
-- Adaptive quality based on performance
-
-## External Resources
-
-### Documentation
-- [Three.js Docs](https://threejs.org/docs/)
-- [GLSL Reference](https://www.khronos.org/opengl/wiki/Core_Language_(GLSL))
-- [D3.js API](https://d3js.org/api)
-
-### Inspiration
-- [Particle Systems Examples](https://threejs.org/examples/?q=particle)
-- [Data Visualization Gallery](https://observablehq.com/@d3/gallery)
-- [WebGL Best Practices](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices)
-
-## Debugging Commands
-
-```bash
-# Development with hot reload
-npm run dev
-
-# Production build
-npm run build
-
-# Preview production build
-npm run preview
-
-# Analyze bundle size
-npx vite-bundle-visualizer
-```
-
-## Important Notes
-
-- Always test with both small (100) and large (10,000+) particle counts
-- Maintain 60 FPS as primary performance metric
-- Document any WebGL extensions required
-- Keep mobile performance in mind
-- Preserve artistic vision while optimizing
+This visualization helps defenders understand:
+- Real APT attack chains
+- Living Off the Land techniques
+- Critical infrastructure vulnerabilities
+- Multi-stage attack progression
+- Defensive priorities (CISA guidance)
 
 ---
 
-Last Updated: Project initialization
-Version: 1.0.0
+*This document serves as the primary context for AI assistants working on the VT_Viz project.*
+*For detailed architecture, see /docs/CLAUDE.md*
