@@ -73,27 +73,90 @@ Data:
 2. **IT Network** (Center) - Corporate systems
 3. **OT/SCADA** (Right) - Critical infrastructure
 
-## 🚀 Installation
+## 🚀 Installation & Setup
+
+### Prerequisites
+
+Before running this visualization, you'll need:
+
+1. **Node.js** (v16 or higher)
+   - Download from: https://nodejs.org/
+   - Verify installation: `node --version`
+
+2. **npm** (comes with Node.js)
+   - Verify installation: `npm --version`
+
+3. **Git** (to clone the repository)
+   - Download from: https://git-scm.com/
+   - Verify installation: `git --version`
+
+### Step-by-Step Installation
 
 ```bash
-# Clone repository
-git clone [repository-url]
-cd VizOne
+# 1. Clone the repository
+git clone https://github.com/ahays248/VT_Viz.git
+cd VT_Viz
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Start development server
-npm run dev
+# 3. Generate attack data (optional - data is pre-generated)
+npm run generate-data
 
-# Build for production
-npm run build
+# 4. Start the development server
+npm run dev
 ```
+
+The visualization will open automatically at `http://localhost:3000/` (or port 3001 if 3000 is in use).
+
+### Quick Start (Copy & Paste)
+
+```bash
+# One-line setup for experienced users
+git clone https://github.com/ahays248/VT_Viz.git && cd VT_Viz && npm install && npm run dev
+```
+
+### Building for Production
+
+```bash
+# Create optimized production build
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+The production build will be in the `dist/` folder, ready for deployment to any static hosting service.
+
+### Troubleshooting Installation
+
+**Port already in use:**
+- The dev server will automatically try port 3001 if 3000 is busy
+- Or manually specify: `npm run dev -- --port 3002`
+
+**npm install fails:**
+```bash
+# Clear npm cache and retry
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Visualization doesn't load:**
+- Check browser console for errors (F12)
+- Ensure WebGL is enabled in your browser
+- Try Chrome, Firefox, or Edge (latest versions)
+
+### System Requirements
+
+- **Minimum:** 4GB RAM, modern browser with WebGL support
+- **Recommended:** 8GB RAM, dedicated graphics card
+- **Browsers:** Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
 
 ## 📁 Project Structure
 
 ```
-VizOne/
+VT_Viz/
 ├── src/
 │   ├── volt-typhoon-timeline.js   # Main visualization logic
 │   ├── scene.js                   # Three.js scene setup
@@ -197,6 +260,16 @@ MIT License - Educational Use
 - Microsoft Security for detailed analysis
 - FBI for infrastructure impact data
 - The cybersecurity community for collaborative defense
+
+---
+
+## 🆘 Getting Help
+
+If you encounter issues:
+
+1. Check the [Troubleshooting](#troubleshooting-installation) section above
+2. Review [docs/CLAUDE.md](./docs/CLAUDE.md) for technical details
+3. Open an issue on GitHub: https://github.com/ahays248/VT_Viz/issues
 
 ---
 
